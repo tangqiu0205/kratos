@@ -92,6 +92,9 @@ func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) err
 		if err != nil {
 			return err
 		}
+		if u.Scheme == "http" {
+			continue
+		}
 		host, port, err := net.SplitHostPort(u.Host)
 		if err != nil {
 			return err
@@ -117,7 +120,7 @@ func (r *Registry) Register(_ context.Context, si *registry.ServiceInstance) err
 		_, e := r.cli.RegisterInstance(vo.RegisterInstanceParam{
 			Ip:          host,
 			Port:        uint64(p),
-			ServiceName: si.Name + "." + u.Scheme,
+			ServiceName: si.Name,
 			Weight:      r.opts.weight,
 			Enable:      true,
 			Healthy:     true,
@@ -151,7 +154,7 @@ func (r *Registry) Deregister(_ context.Context, service *registry.ServiceInstan
 		if _, err = r.cli.DeregisterInstance(vo.DeregisterInstanceParam{
 			Ip:          host,
 			Port:        uint64(p),
-			ServiceName: service.Name + "." + u.Scheme,
+			ServiceName: service.Name,
 			GroupName:   r.opts.group,
 			Cluster:     r.opts.cluster,
 			Ephemeral:   true,
